@@ -8,12 +8,20 @@ const video = document.querySelector("#videoElement");
 
 const artCtx = artCanvas.getContext("2d");
 
+let glfxCanvas, texture;
+
 // draw loop
 export function draw({ webcamRes }) {
   // if (!params) reloadAfterMs();
 
   if (video.srcObject && !video.srcObject.active) {
     reloadAfterMs();
+  }
+
+  if (!glfxCanvas) {
+    // fx loaded in index.html script tag
+    glfxCanvas = fx.canvas();
+    console.log("glfxCanvas: ", glfxCanvas);
   }
 
   const frameCanvas = getFlippedVideoCanvas({
@@ -24,8 +32,13 @@ export function draw({ webcamRes }) {
     flipY: false,
   });
 
+  if (glfxCanvas && video) {
+    texture = glfxCanvas.texture(frameCanvas);
+    glfxCanvas.draw(texture).ink(0.8).update();
+  }
+
   artCanvas.width = webcamRes.w;
   artCanvas.height = webcamRes.h;
 
-  artCtx.drawImage(frameCanvas, 0, 0);
+  artCtx.drawImage(glfxCanvas, 0, 0);
 }

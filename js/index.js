@@ -34,15 +34,15 @@ function doDraw() {
 }
 
 function addFps() {
-  if (Stats) {
-    stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
-  }
+  // stats loaded in index.html script tag
+  stats = new Stats();
+  stats.showPanel(0);
+  document.body.appendChild(stats.dom);
 }
 
 // SET UP CONTROLS
 function setupControls() {
+  // dat loaded in index.html script tag
   const gui = new dat.GUI();
   gui.useLocalStorage = true;
   gui.remember(params);
