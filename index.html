@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GLFX Webcam Expts</title>
+    <link rel="stylesheet" href="css/global-reset.css" />
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+
+  <body>
+      <div id="container">
+      <main id="app">
+        <canvas id="artCanvas"></canvas>
+        <canvas id="guideCanvas"></canvas>
+      </main>
+    </div>
+
+    <!-- WEB CAM (hidden) -->
+    <video autoplay="true" id="videoElement"></video>
+
+    <script type="text/javascript" src="./libs/dat.gui.js"></script>
+    <script type="text/javascript" src="./libs/stats.min.js"></script>
+    <script type="text/javascript" src="./libs/glfx.js"></script>
+    <script type="module" src="./js/index.js"></script>
+  </body>
+</html>
