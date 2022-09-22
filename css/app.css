@@ -27,7 +27,7 @@ body {
 }
 
 #guideCanvas {
-  /* display: none; */
+  display: none;
 }
 
 #artSvg {
