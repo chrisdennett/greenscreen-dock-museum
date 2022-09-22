@@ -34,6 +34,7 @@ export function draw({ webcamRes, params, initParams }) {
   if (glfxCanvas && video) {
     texture = glfxCanvas.texture(frameCanvas);
     let gc = glfxCanvas.draw(texture);
+    gc.sepia(params.sepia);
 
     gc.lensBlur(
       params.lensBlurRadius,
@@ -47,8 +48,11 @@ export function draw({ webcamRes, params, initParams }) {
     gc.vibrance(params.vibrance);
     gc.ink(params.ink);
 
+    if (params.edgeWork > 0) {
+      gc.edgeWork(params.edgeWork);
+    }
+
     gc.noise(params.noise);
-    gc.sepia(params.sepia);
     gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
 
     gc.update();
