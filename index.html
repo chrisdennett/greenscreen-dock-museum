@@ -7,19 +7,19 @@
   </head>
 
   <body>
-      <div id="container">
-      <main id="app">
+
+      <main id="app" class="fullscreen">
         <canvas id="artCanvas"></canvas>
-        <canvas id="guideCanvas"></canvas>
+        <!-- <canvas id="guideCanvas"></canvas> -->
       </main>
-    </div>
+      
 
     <!-- WEB CAM (hidden) -->
     <video autoplay="true" id="videoElement"></video>
 
     <script type="text/javascript" src="./libs/dat.gui.js"></script>
     <script type="text/javascript" src="./libs/stats.min.js"></script>
-    <script type="text/javascript" src="./libs/glfx.js"></script>
+    <script type="text/javascript" src="./libs/glfx-full.js"></script>
     <script type="module" src="./js/index.js"></script>
   </body>
 </html>
