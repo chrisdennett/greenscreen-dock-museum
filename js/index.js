@@ -7,6 +7,10 @@ let stats;
 const webcamRes = { w: 800, h: 600 };
 
 const params = {
+  keyColor: "#15cb99",
+  keySimilarity: 0.4,
+  keySmoothness: 0.08,
+  keySpill: 0.1,
   brightness: 0,
   contrast: 0,
   denoise: 100,
@@ -25,7 +29,6 @@ const params = {
   edgeWork: 0,
   ink: 0,
 };
-const initParams = { ...params };
 
 addFps();
 setupControls();
@@ -34,7 +37,7 @@ doDraw();
 
 function doDraw() {
   if (stats) stats.begin();
-  draw({ webcamRes, params, initParams });
+  draw({ webcamRes, params });
   if (stats) stats.end();
 
   window.requestAnimationFrame(doDraw);
@@ -54,6 +57,13 @@ function setupControls() {
   gui.useLocalStorage = true;
   gui.remember(params);
   // general filters, positions etc
+
+  const chromaKey = gui.addFolder("chromaKey");
+  chromaKey.addColor(params, "keyColor");
+  chromaKey.add(params, "keySimilarity").min(0).max(1).step(0.001);
+  chromaKey.add(params, "keySmoothness").min(0).max(1).step(0.001);
+  chromaKey.add(params, "keySpill").min(0).max(1).step(0.001);
+
   const filters = gui.addFolder("filters");
   filters.add(params, "brightness").min(-1).max(1).step(0.001);
   filters.add(params, "contrast").min(-1).max(1).step(0.001);
@@ -81,6 +91,11 @@ function setupControls() {
   "preset": "watercolour-2",
   "closed": false,
   "folders": {
+    "chromaKey": {
+      "preset": "Default",
+      "closed": false,
+      "folders": {}
+    },
     "filters": {
       "preset": "Default",
       "closed": false,
@@ -130,22 +145,26 @@ function setupControls() {
     },
     "watercolour-2": {
       "0": {
+        "keyColor": "#15cb99",
+        "keySimilarity": 0.082,
+        "keySmoothness": 0.24,
+        "keySpill": 0.1,
         "brightness": 0.31,
-        "contrast": 0.266,
+        "contrast": 0.27,
         "denoise": 36,
         "hue": 0,
         "saturation": 0,
         "noise": 0.17,
-        "sepia": 0.402,
+        "sepia": 0.435,
         "unsharpRadius": 0,
         "unsharpStrength": 0,
         "vibrance": 1,
         "lensBlurRadius": 2,
-        "lensBlurBrightness": -0.418,
-        "lensBlurAngle": 0.742,
+        "lensBlurBrightness": -0.42,
+        "lensBlurAngle": 0.74,
         "triangleBlur": 0,
         "edgeWork": 0,
-        "ink": 0.622
+        "ink": 0.15
       }
     }
   }

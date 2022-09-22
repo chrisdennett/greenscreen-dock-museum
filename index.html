@@ -8,19 +8,14 @@
 
   <body>
 
+    <div id="guideCanvasHolder">
+      Key color<input type="color" id="keyColor" value="#00FF00" />
+      <canvas id="guideCanvas"></canvas>
+    </div>
     <main id="app" class="fullscreen">
-        <div style="margin-top:50px">
-          Key color<input type="color" id="keyColor" value="#00ff00" />
-    
-          Similarity<input type="range" id="similarity" min="0" max="1" step="0.001" value="0.4" />
-    
-          Smoothness<input type="range" id="smoothness" min="0" max="1" step="0.001" value="0.08" />
-    
-          Spill<input type="range" id="spill" min="0" max="1" step="0.001" value="0.1" />
-        </div>
 
         <canvas id="artCanvas" style="background-image: url(/img/AlbumPainting_01.jpg); background-size: cover;  max-width: initial"></canvas>
-        <canvas id="guideCanvas"></canvas>
+        
       </main>
       
 

@@ -56,67 +56,7 @@ const similarityLoc = gl.getUniformLocation(prog, "similarity");
 const smoothnessLoc = gl.getUniformLocation(prog, "smoothness");
 const spillLoc = gl.getUniformLocation(prog, "spill");
 
-function startWebcam() {
-  navigator.mediaDevices
-    .getUserMedia({
-      video: {
-        facingMode: "user",
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-    })
-    .then((stream) => {
-      video.srcObject = stream;
-      video.play();
-      function processFrame(now, metadata) {
-        greenscreenCanvas.width = metadata.width;
-        greenscreenCanvas.height = metadata.height;
-        gl.viewport(0, 0, metadata.width, metadata.height);
-        gl.texImage2D(
-          gl.TEXTURE_2D,
-          0,
-          gl.RGB,
-          gl.RGB,
-          gl.UNSIGNED_BYTE,
-          video
-        );
-        gl.uniform1i(texLoc, 0);
-        gl.uniform1f(texWidthLoc, metadata.width);
-        gl.uniform1f(texHeightLoc, metadata.height);
-        const m = document
-          .getElementById("keyColor")
-          .value.match(/^#([0-9a-f]{6})$/i)[1];
-        gl.uniform3f(
-          keyColorLoc,
-          parseInt(m.substr(0, 2), 16) / 255,
-          parseInt(m.substr(2, 2), 16) / 255,
-          parseInt(m.substr(4, 2), 16) / 255
-        );
-        gl.uniform1f(
-          similarityLoc,
-          parseFloat(document.getElementById("similarity").value)
-        );
-        gl.uniform1f(
-          smoothnessLoc,
-          parseFloat(document.getElementById("smoothness").value)
-        );
-        gl.uniform1f(
-          spillLoc,
-          parseFloat(document.getElementById("spill").value)
-        );
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-        video.requestVideoFrameCallback(processFrame);
-      }
-      video.requestVideoFrameCallback(processFrame);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-}
-
-// startWebcam();
-
-function drawGreenscreen({ webcamRes, sourceCanvas }) {
+function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
   greenscreenCanvas.width = webcamRes.w;
   greenscreenCanvas.height = webcamRes.h;
   gl.viewport(0, 0, webcamRes.w, webcamRes.h);
@@ -131,27 +71,20 @@ function drawGreenscreen({ webcamRes, sourceCanvas }) {
   gl.uniform1i(texLoc, 0);
   gl.uniform1f(texWidthLoc, webcamRes.w);
   gl.uniform1f(texHeightLoc, webcamRes.h);
-  const m = document
-    .getElementById("keyColor")
-    .value.match(/^#([0-9a-f]{6})$/i)[1];
+  const m = params.keyColor.match(/^#([0-9a-f]{6})$/i)[1];
   gl.uniform3f(
     keyColorLoc,
     parseInt(m.substr(0, 2), 16) / 255,
     parseInt(m.substr(2, 2), 16) / 255,
     parseInt(m.substr(4, 2), 16) / 255
   );
-  gl.uniform1f(
-    similarityLoc,
-    parseFloat(document.getElementById("similarity").value)
-  );
-  gl.uniform1f(
-    smoothnessLoc,
-    parseFloat(document.getElementById("smoothness").value)
-  );
-  gl.uniform1f(spillLoc, parseFloat(document.getElementById("spill").value));
+
+  gl.uniform1f(similarityLoc, params.keySimilarity);
+
+  gl.uniform1f(smoothnessLoc, params.keySmoothness);
+  gl.uniform1f(spillLoc, params.keySpill);
   gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
 }
-
 // END GREEN SCREEN CODE
 
 const artCtx = artCanvas.getContext("2d");
@@ -159,7 +92,7 @@ const artCtx = artCanvas.getContext("2d");
 let glfxCanvas, texture;
 
 // draw loop
-export function draw({ webcamRes, params, initParams }) {
+export function draw({ webcamRes, params }) {
   // if (!params) reloadAfterMs();
 
   if (video.srcObject && !video.srcObject.active) {
@@ -174,7 +107,7 @@ export function draw({ webcamRes, params, initParams }) {
     flipY: false,
   });
 
-  drawGreenscreen({ webcamRes, sourceCanvas: frameCanvas });
+  drawGreenscreen({ webcamRes, sourceCanvas: frameCanvas, params });
 
   if (!glfxCanvas) {
     // fx loaded in index.html script tag
@@ -191,19 +124,19 @@ export function draw({ webcamRes, params, initParams }) {
       params.lensBlurBrightness,
       params.lensBlurAngle
     );
-    gc.triangleBlur(params.triangleBlur);
+    // gc.triangleBlur(params.triangleBlur);
     gc.denoise(params.denoise);
     gc.brightnessContrast(params.brightness, params.contrast);
-    gc.hueSaturation(params.hue, params.saturation);
+    // gc.hueSaturation(params.hue, params.saturation);
     gc.vibrance(params.vibrance);
     gc.ink(params.ink);
 
-    if (params.edgeWork > 0) {
-      gc.edgeWork(params.edgeWork);
-    }
+    // if (params.edgeWork > 0) {
+    //   gc.edgeWork(params.edgeWork);
+    // }
 
     gc.noise(params.noise);
-    gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
+    // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
 
     gc.update();
   }
