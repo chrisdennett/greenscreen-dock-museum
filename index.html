@@ -33,7 +33,11 @@
       uniform float similarity;
       uniform float smoothness;
       uniform float spill;
-      
+
+      vec4 testColour1 = vec4(1.0, 0.0, 0.0, 1.0);
+      vec4 testColour2 = vec4(0.0, 1.0, 0.0, 1.0);
+      vec4 testColour3 = vec4(0.0, 0.0, 1.0, 1.0);
+    
       // From https://github.com/libretro/glsl-shaders/blob/master/nnedi3/shaders/rgb-to-yuv.glsl
       vec2 RGBtoUV(vec3 rgb) {
         return vec2(
@@ -75,8 +79,39 @@
         vec2 texCoord = vec2(gl_FragCoord.x/texWidth, 1.0 - (gl_FragCoord.y/texHeight));
   
         vec4 greenScreenColor = ProcessChromaKey(texCoord);
+
+        vec4 posterized = Posterize(greenScreenColor);
+
+        float minDist = 9.9;
+        float dist;
+        vec4 paletteColour = vec4(1.0, 1.0, 1.0, 1.0);
+
+        for(int i=0; i<3; i++){
+
+        }
+
+        dist = distance(posterized, testColour1);
+        if(dist < minDist){
+          minDist = dist;
+          paletteColour = testColour1;
+        }
+
+        dist = distance(posterized, testColour2);
+        if(dist < minDist){
+          minDist = dist;
+          paletteColour = testColour2;
+        }
+
+        dist = distance(posterized, testColour3);
+        if(dist < minDist){
+          minDist = dist;
+          paletteColour = testColour3;
+        }
+
+
+        vec4 color = vec4(dist,0.0,0.0,1.0);
   
-        gl_FragColor = Posterize(greenScreenColor);
+        gl_FragColor = paletteColour;
       }
     </script>
 

@@ -22,7 +22,7 @@ function connectWebCamToVideo(webcamRes) {
         video.srcObject = mediaStream;
       })
       .catch(function (error) {
-        reloadAfterMs();
+        // reloadAfterMs();
       });
   }
 }
