@@ -6,7 +6,8 @@ import { vert, frag } from "../shaders/greenscreen.shaders.js";
 const artCanvas = document.querySelector("#artCanvas");
 const artCtx = artCanvas.getContext("2d");
 const video = document.querySelector("#videoElement");
-const greenscreenCanvas = document.querySelector("#guideCanvas");
+const greenscreenCanvas = document.createElement("canvas");
+// const greenscreenCanvas = document.querySelector("#guideCanvas");
 let glfxCanvas, texture;
 
 const gl = greenscreenCanvas.getContext("webgl", { premultipliedAlpha: false });
@@ -119,7 +120,7 @@ function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
 // END GREEN SCREEN CODE
 
 // draw loop
-export function draw({ webcamRes, params }) {
+export function draw({ webcamRes, params, img1 }) {
   // if (!params) reloadAfterMs();
 
   if (video.srcObject && !video.srcObject.active) {
@@ -168,10 +169,41 @@ export function draw({ webcamRes, params }) {
     gc.update();
   }
 
-  artCanvas.width = webcamRes.w;
-  artCanvas.height = webcamRes.h;
+  const { w, h } = webcamRes;
+  artCanvas.width = w;
+  artCanvas.height = h;
 
-  artCtx.drawImage(glfxCanvas, 0, 0);
+  const inLeft = w * params.cropLeft;
+  const inRight = w * params.cropRight;
+  const inTop = h * params.cropTop;
+  const inBottom = h * params.cropBottom;
+  const inWidth = w - (inLeft + inRight);
+  const inHeight = h - (inTop + inBottom);
+
+  const wToHRatio = inHeight / inWidth;
+
+  const outLeft = params.left * w;
+  const outTop = params.top * h;
+  const outWidth = params.size * inWidth;
+  const outHeight = wToHRatio * outWidth;
+
+  // artCtx.drawImage(glfxCanvas, 0, 0);
+
+  // draw painting
+  artCtx.drawImage(img1, 0, 0, img1.width, img1.height, 0, 0, w, h);
+
+  // draw webcam image
+  artCtx.drawImage(
+    glfxCanvas,
+    inLeft,
+    inTop,
+    inWidth,
+    inHeight,
+    outLeft,
+    outTop,
+    outWidth,
+    outHeight
+  );
 }
 
 /*

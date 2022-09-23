@@ -7,6 +7,13 @@ let stats;
 const webcamRes = { w: 800, h: 600 };
 
 const params = {
+  cropLeft: 0.1,
+  cropRight: 0.15,
+  cropTop: 0.1,
+  cropBottom: 0,
+  left: 0.3,
+  top: 0.3,
+  size: 1,
   keyColor: "#15cb99",
   keySimilarity: 0.4,
   keySmoothness: 0.08,
@@ -30,6 +37,7 @@ const params = {
   ink: 0,
 };
 
+const img1 = await loadImage("/img/AlbumPainting_01.jpg");
 addFps();
 setupControls();
 setup(webcamRes);
@@ -37,7 +45,7 @@ doDraw();
 
 function doDraw() {
   if (stats) stats.begin();
-  draw({ webcamRes, params });
+  draw({ webcamRes, params, img1 });
   if (stats) stats.end();
 
   window.requestAnimationFrame(doDraw);
@@ -56,7 +64,15 @@ function setupControls() {
   const gui = new dat.GUI();
   gui.useLocalStorage = true;
   gui.remember(params);
-  // general filters, positions etc
+
+  const position = gui.addFolder("position");
+  position.add(params, "cropLeft").min(0).max(1).step(0.001);
+  position.add(params, "cropRight").min(0).max(1).step(0.001);
+  position.add(params, "cropTop").min(0).max(1).step(0.001);
+  position.add(params, "cropBottom").min(0).max(1).step(0.001);
+  position.add(params, "left").min(0).max(1).step(0.001);
+  position.add(params, "top").min(0).max(1).step(0.001);
+  position.add(params, "size").min(0).max(1).step(0.001);
 
   const chromaKey = gui.addFolder("chromaKey");
   chromaKey.addColor(params, "keyColor");
@@ -83,7 +99,18 @@ function setupControls() {
   filters.add(params, "ink").min(0).max(1).step(0.001);
 
   // starting folder state
-  filters.closed = false;
+  position.closed = false;
+  chromaKey.closed = true;
+  filters.closed = true;
+}
+
+async function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject();
+    img.src = url;
+  });
 }
 
 /*
@@ -161,7 +188,7 @@ function setupControls() {
         "vibrance": 1,
         "lensBlurRadius": 2,
         "lensBlurBrightness": -0.42,
-        "lensBlurAngle": 0.74,
+        "lensBlurAngle": 0.74, 
         "triangleBlur": 0,
         "edgeWork": 0,
         "ink": 0.15
