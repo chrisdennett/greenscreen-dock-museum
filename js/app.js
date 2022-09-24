@@ -5,6 +5,7 @@ import { vert, frag } from "../shaders/greenscreen.shaders.js";
 // app elements
 const artCanvas = document.querySelector("#artCanvas");
 const artCtx = artCanvas.getContext("2d");
+const videoColorSelector = document.querySelector("#videoHolder");
 const video = document.querySelector("#videoElement");
 const greenscreenCanvas = document.createElement("canvas");
 // const greenscreenCanvas = document.querySelector("#guideCanvas");
@@ -187,9 +188,7 @@ export function draw({ webcamRes, params, img1 }) {
   const outWidth = params.size * inWidth;
   const outHeight = wToHRatio * outWidth;
 
-  // artCtx.drawImage(glfxCanvas, 0, 0);
-
-  // draw painting
+  // draw image
   artCtx.drawImage(img1, 0, 0, img1.width, img1.height, 0, 0, w, h);
 
   // draw webcam image
@@ -204,6 +203,11 @@ export function draw({ webcamRes, params, img1 }) {
     outWidth,
     outHeight
   );
+
+  // controls
+  videoColorSelector.style.display = params.showColorDropper
+    ? "inherit"
+    : "none";
 }
 
 /*
