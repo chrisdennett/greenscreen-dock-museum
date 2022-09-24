@@ -8,20 +8,17 @@
 
   <body>
 
-    <div id="guideCanvasHolder">
-      Key color<input type="color" id="keyColor" value="#00FF00" />
-      <canvas id="guideCanvas"></canvas>
-    </div>
     <main id="app" class="fullscreen">
-        <!-- <img src="/img/AlbumPainting_01.jpg" alt="watercolour picture"/> -->
-
+       
         <canvas id="artCanvas"></canvas>
         
       </main>
       
-
-    <!-- WEB CAM (hidden) -->
-    <video autoplay="true" id="videoElement"></video>
+    <!-- WEB CAM + colour selector -->
+    <div id="videoHolder">
+      <input type="color" id="keyColor" value="#00FF00" />
+      <video autoplay="true" id="videoElement"></video>
+    </div>
 
     <script id="fragment-shader" type="glsl">
       precision mediump float;
