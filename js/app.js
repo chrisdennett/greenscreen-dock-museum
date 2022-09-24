@@ -195,15 +195,16 @@ export function draw({ webcamRes, params, img1 }) {
     let gc = glfxCanvas.draw(texture);
     gc.sepia(params.sepia);
 
-    gc.lensBlur(
-      params.lensBlurRadius,
-      params.lensBlurBrightness,
-      params.lensBlurAngle
-    );
+    // gc.lensBlur(
+    //   params.lensBlurRadius,
+    //   params.lensBlurBrightness,
+    //   params.lensBlurAngle
+    // );
     // gc.triangleBlur(params.triangleBlur);
-    gc.denoise(params.denoise);
     gc.brightnessContrast(params.brightness, params.contrast);
+    gc.denoise(params.denoise);
     // gc.hueSaturation(params.hue, params.saturation);
+    // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
     gc.vibrance(params.vibrance);
     gc.ink(params.ink);
 
@@ -212,7 +213,6 @@ export function draw({ webcamRes, params, img1 }) {
     // }
 
     gc.noise(params.noise);
-    // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
 
     gc.update();
   }
@@ -250,6 +250,7 @@ export function draw({ webcamRes, params, img1 }) {
 
   // draw webcam image
   artCtx.save();
+  artCtx.globalAlpha = 0.8;
   artCtx.drawImage(
     glfxCanvas,
     inLeft,
