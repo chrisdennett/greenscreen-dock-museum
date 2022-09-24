@@ -5,7 +5,8 @@ import { setup } from "./setupWebcam.js";
 let stats;
 
 // const webcamRes = { w: 320, h: 240 };
-const webcamRes = { w: 800, h: 600 };
+const webcamRes = { w: 640, h: 480 };
+// const webcamRes = { w: 800, h: 600 };
 
 const img1 = await loadImage("/img/AlbumPainting_01.jpg");
 addFps();

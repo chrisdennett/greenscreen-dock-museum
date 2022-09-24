@@ -1,4 +1,4 @@
-export function getFlippedVideoCanvas({ video, w, h, flipX, flipY }) {
+export function getFlippedVideoCanvas({ video, canvas, w, h, flipX, flipY }) {
   const frameCanvas = document.createElement("canvas");
   frameCanvas.width = w;
   frameCanvas.height = h;
@@ -13,11 +13,19 @@ export function getFlippedVideoCanvas({ video, w, h, flipX, flipY }) {
   frameCtx.scale(scaleX, scaleY);
 
   // show central panel of video
-  const { videoWidth: vidW, videoHeight: vidH } = video;
+  let src, srcW, srcH;
 
-  // const xOffset = (vidW - w) / 2;
+  if (video) {
+    src = video;
+    srcW = video.videoWidth;
+    srcH = video.videoHeight;
+  } else {
+    src = canvas;
+    srcW = canvas.width;
+    srcH = canvas.height;
+  }
 
-  frameCtx.drawImage(video, 0, 0, vidW, vidH, 0, 0, w, h);
+  frameCtx.drawImage(src, 0, 0, srcW, srcH, 0, 0, w, h);
 
   return frameCanvas;
 }

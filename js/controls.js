@@ -73,7 +73,7 @@ export function setupControls() {
 
   // starting folder state
   position.closed = true;
-  chromaKey.closed = false;
+  chromaKey.closed = true;
   filters.closed = true;
 
   const keyColorSelector = document.querySelector("#keyColorSelector");
@@ -191,7 +191,7 @@ export function setupControls() {
         "lensBlurAngle": 0.464,
         "triangleBlur": 0,
         "edgeWork": 0,
-        "ink": 0.10400000000000001
+        "ink": 0.1
       }
     }
   }

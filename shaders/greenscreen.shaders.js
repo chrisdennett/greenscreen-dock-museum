@@ -31,8 +31,7 @@ vec2 RGBtoUV(vec3 rgb) {
     );
 }
     
-vec4 ProcessChromaKey(vec2 texCoord) {
-    vec4 rgba = texture2D(tex, texCoord);
+vec4 ProcessChromaKey(vec4 rgba, vec2 texCoord) {
     float chromaDist = distance(RGBtoUV(texture2D(tex, texCoord).rgb), RGBtoUV(keyColor));
     
     float baseMask = chromaDist - similarity;
@@ -86,15 +85,25 @@ vec4 MapToPalette(in vec4 inputColor){
 void main(void) {
     vec2 texCoord = vec2(gl_FragCoord.x/texWidth, 1.0 - (gl_FragCoord.y/texHeight));
 
-    vec4 greenScreenColor = ProcessChromaKey(texCoord);
-    vec4 paletteColour = greenScreenColor;
+    vec4 rgba = texture2D(tex, texCoord);
+    vec4 greenScreenColor;
+
+    if(rgba.r == 0.0 && rgba.g == 0.0 && rgba.b == 0.0 ){
+        greenScreenColor = vec4(0.0, 0.0, 0.0, 0.0);
+    }
+    else if(rgba.a < 0.7){
+        greenScreenColor = vec4(0.0, 0.0, 0.0, 0.0);
+    }
+    else{
+        greenScreenColor = ProcessChromaKey(rgba, texCoord);
+    }
     
-    // don't bother posterizing the transparent pixels
+    //don't bother posterizing the transparent pixels
     if(greenScreenColor[3] > 0.0){
-        paletteColour = Posterize(greenScreenColor);
+        greenScreenColor = Posterize(greenScreenColor);
     }
 
-    // gl_FragColor = MapToPalette(paletteColour);
-    gl_FragColor = paletteColour;
+    // gl_FragColor = MapToPalette(greenScreenColor);
+    gl_FragColor = greenScreenColor;
 }
 `;

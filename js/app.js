@@ -8,6 +8,10 @@ const artCtx = artCanvas.getContext("2d");
 const videoColorSelector = document.querySelector("#videoHolder");
 const video = document.querySelector("#videoElement");
 const greenscreenCanvas = document.createElement("canvas");
+
+const selfieCanvas = document.createElement("canvas");
+const selfieCtx = selfieCanvas.getContext("2d");
+
 // const greenscreenCanvas = document.querySelector("#guideCanvas");
 let glfxCanvas, texture;
 
@@ -93,8 +97,8 @@ function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
-    gl.RGB,
-    gl.RGB,
+    gl.RGBA,
+    gl.RGBA,
     gl.UNSIGNED_BYTE,
     sourceCanvas
   );
@@ -120,6 +124,43 @@ function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
 }
 // END GREEN SCREEN CODE
 
+function setUpCamera(webcamRes) {
+  selfieCanvas.width = webcamRes.w;
+  selfieCanvas.height = webcamRes.h;
+
+  function onResults(results) {
+    selfieCtx.save();
+    selfieCtx.clearRect(0, 0, selfieCanvas.width, selfieCanvas.height);
+    selfieCtx.drawImage(results.segmentationMask, 0, 0);
+
+    // Only overwrite missing pixels.
+    selfieCtx.globalCompositeOperation = "source-in";
+    selfieCtx.drawImage(results.image, 0, 0);
+
+    selfieCtx.restore();
+  }
+
+  const selfieSegmentation = new SelfieSegmentation({
+    locateFile: (file) => {
+      return `/libs/mediapipe/selfie_segmentation/${file}`;
+    },
+  });
+
+  selfieSegmentation.setOptions({ modelSelection: 1 });
+  selfieSegmentation.onResults(onResults);
+
+  const camera = new Camera(video, {
+    onFrame: async () => {
+      await selfieSegmentation.send({ image: video });
+    },
+    width: webcamRes.w,
+    height: webcamRes.h,
+  });
+  camera.start();
+}
+
+let cameraSetUp = false;
+
 // draw loop
 export function draw({ webcamRes, params, img1 }) {
   // if (!params) reloadAfterMs();
@@ -128,8 +169,13 @@ export function draw({ webcamRes, params, img1 }) {
     reloadAfterMs();
   }
 
+  if (!cameraSetUp && video) {
+    cameraSetUp = true;
+    setUpCamera(webcamRes);
+  }
+
   const frameCanvas = getFlippedVideoCanvas({
-    video,
+    canvas: selfieCanvas,
     w: webcamRes.w,
     h: webcamRes.h,
     flipX: true,
@@ -143,8 +189,9 @@ export function draw({ webcamRes, params, img1 }) {
     glfxCanvas = fx.canvas();
   }
 
-  if (glfxCanvas && video) {
+  if (glfxCanvas && frameCanvas) {
     texture = glfxCanvas.texture(greenscreenCanvas);
+    // texture = glfxCanvas.texture(frameCanvas);
     let gc = glfxCanvas.draw(texture);
     gc.sepia(params.sepia);
 
@@ -171,8 +218,8 @@ export function draw({ webcamRes, params, img1 }) {
   }
 
   const { w, h } = webcamRes;
-  artCanvas.width = w;
-  artCanvas.height = h;
+  artCanvas.width = 1280;
+  artCanvas.height = 720;
 
   const inLeft = w * params.cropLeft;
   const inRight = w * params.cropRight;
@@ -181,7 +228,7 @@ export function draw({ webcamRes, params, img1 }) {
   const inWidth = w - (inLeft + inRight);
   const inHeight = h - (inTop + inBottom);
 
-  const wToHRatio = inHeight / inWidth;
+  const wToHRatio = artCanvas.height / artCanvas.width;
 
   const outLeft = params.left * w;
   const outTop = params.top * h;
@@ -189,9 +236,20 @@ export function draw({ webcamRes, params, img1 }) {
   const outHeight = wToHRatio * outWidth;
 
   // draw image
-  artCtx.drawImage(img1, 0, 0, img1.width, img1.height, 0, 0, w, h);
+  artCtx.drawImage(
+    img1,
+    0,
+    0,
+    img1.width,
+    img1.height,
+    0,
+    0,
+    artCanvas.width,
+    artCanvas.height
+  );
 
   // draw webcam image
+  artCtx.save();
   artCtx.drawImage(
     glfxCanvas,
     inLeft,
@@ -203,6 +261,10 @@ export function draw({ webcamRes, params, img1 }) {
     outWidth,
     outHeight
   );
+
+  // artCtx.drawImage(selfieCanvas, 0, 0);
+  // artCtx.drawImage(greenscreenCanvas, 0, 0);
+  // artCtx.drawImage(frameCanvas, 0, 0);
 
   // controls
   videoColorSelector.style.display = params.showColorDropper
