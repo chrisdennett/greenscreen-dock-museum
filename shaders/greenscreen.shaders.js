@@ -91,7 +91,7 @@ void main(void) {
     if(rgba.r == 0.0 && rgba.g == 0.0 && rgba.b == 0.0 ){
         greenScreenColor = vec4(0.0, 0.0, 0.0, 0.0);
     }
-    else if(rgba.a < 0.7){
+    else if(rgba.a < 0.3){
         greenScreenColor = vec4(0.0, 0.0, 0.0, 0.0);
     }
     else{
