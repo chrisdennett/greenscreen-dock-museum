@@ -1,35 +1,37 @@
-export function drawGlFxCanvas({ sourceCanvas, params, glfxCanvas }) {
-  if (!sourceCanvas) return;
+// fx loaded in index.html script tag
+let glfxCanvas;
+let texture;
 
-  //   if (!glfxCanvas) {
-  //     // fx loaded in index.html script tag
-  //     glfxCanvas = fx.canvas();
-  //   }
+export function setupGlfxCanvas() {
+  glfxCanvas = fx.canvas();
+  return glfxCanvas;
+}
 
-  if (glfxCanvas && sourceCanvas) {
-    let texture = glfxCanvas.texture(sourceCanvas);
-    let gc = glfxCanvas.draw(texture);
-    gc.sepia(params.sepia);
+export function drawGlFxCanvas({ sourceCanvas, params }) {
+  if (!sourceCanvas || !glfxCanvas) return;
 
-    // gc.lensBlur(
-    //   params.lensBlurRadius,
-    //   params.lensBlurBrightness,
-    //   params.lensBlurAngle
-    // );
-    // gc.triangleBlur(params.triangleBlur);
-    gc.brightnessContrast(params.brightness, params.contrast);
-    gc.denoise(params.denoise);
-    // gc.hueSaturation(params.hue, params.saturation);
-    // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
-    gc.vibrance(params.vibrance);
-    gc.ink(params.ink);
+  texture = glfxCanvas.texture(sourceCanvas);
+  let gc = glfxCanvas.draw(texture);
+  gc.sepia(params.sepia);
 
-    // if (params.edgeWork > 0) {
-    //   gc.edgeWork(params.edgeWork);
-    // }
+  // gc.lensBlur(
+  //   params.lensBlurRadius,
+  //   params.lensBlurBrightness,
+  //   params.lensBlurAngle
+  // );
+  gc.triangleBlur(params.triangleBlur);
+  gc.brightnessContrast(params.brightness, params.contrast);
+  gc.denoise(params.denoise);
+  // gc.hueSaturation(params.hue, params.saturation);
+  // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
+  gc.vibrance(params.vibrance);
+  gc.ink(params.ink);
 
-    gc.noise(params.noise);
+  // if (params.edgeWork > 0) {
+  //   gc.edgeWork(params.edgeWork);
+  // }
 
-    gc.update();
-  }
+  gc.noise(params.noise);
+
+  gc.update();
 }

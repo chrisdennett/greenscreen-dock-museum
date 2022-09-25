@@ -5,6 +5,7 @@ import {
   drawGreenscreen,
   setupGreenScreenShader,
 } from "./utils/drawGreenscreen.js";
+import { drawGlFxCanvas, setupGlfxCanvas } from "./utils/drawGlFxCanvas.js";
 
 // app elements
 const videoColorSelector = document.querySelector("#videoHolder");
@@ -12,9 +13,9 @@ const video = document.querySelector("#videoElement");
 
 const selfieCanvas = document.createElement("canvas");
 const selfieCtx = selfieCanvas.getContext("2d");
-const greenscreenCanvas = setupGreenScreenShader();
 
-let glfxCanvas, texture;
+const greenscreenCanvas = setupGreenScreenShader();
+const glfxCanvas = setupGlfxCanvas();
 
 let cameraSetUp = false;
 const useMediaPipe = false;
@@ -90,40 +91,4 @@ function setUpCamera(webcamRes) {
     height: webcamRes.h,
   });
   camera.start();
-}
-
-function drawGlFxCanvas({ sourceCanvas, params }) {
-  if (!sourceCanvas) return;
-
-  if (!glfxCanvas) {
-    // fx loaded in index.html script tag
-    glfxCanvas = fx.canvas();
-  }
-
-  if (glfxCanvas && sourceCanvas) {
-    texture = glfxCanvas.texture(sourceCanvas);
-    let gc = glfxCanvas.draw(texture);
-    gc.sepia(params.sepia);
-
-    // gc.lensBlur(
-    //   params.lensBlurRadius,
-    //   params.lensBlurBrightness,
-    //   params.lensBlurAngle
-    // );
-    // gc.triangleBlur(params.triangleBlur);
-    gc.brightnessContrast(params.brightness, params.contrast);
-    gc.denoise(params.denoise);
-    // gc.hueSaturation(params.hue, params.saturation);
-    // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
-    gc.vibrance(params.vibrance);
-    gc.ink(params.ink);
-
-    // if (params.edgeWork > 0) {
-    //   gc.edgeWork(params.edgeWork);
-    // }
-
-    gc.noise(params.noise);
-
-    gc.update();
-  }
 }
