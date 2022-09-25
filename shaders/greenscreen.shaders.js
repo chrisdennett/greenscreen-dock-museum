@@ -86,7 +86,7 @@ void main(void) {
     vec2 texCoord = vec2(gl_FragCoord.x/texWidth, 1.0 - (gl_FragCoord.y/texHeight));
 
     vec4 rgba = texture2D(tex, texCoord);
-    vec4 greenScreenColor;
+    vec4 greenScreenColor = rgba;
 
     if(rgba.r == 0.0 && rgba.g == 0.0 && rgba.b == 0.0 ){
         greenScreenColor = vec4(0.0, 0.0, 0.0, 0.0);

@@ -90,10 +90,12 @@ function getPalette() {
   // return [1, 0, 1, 0.5, 0, 0, 1, 0.5];
 }
 
-function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
-  greenscreenCanvas.width = webcamRes.w;
-  greenscreenCanvas.height = webcamRes.h;
-  gl.viewport(0, 0, webcamRes.w, webcamRes.h);
+function drawGreenscreen({ sourceCanvas, params }) {
+  if (!sourceCanvas) return;
+
+  greenscreenCanvas.width = sourceCanvas.width;
+  greenscreenCanvas.height = sourceCanvas.height;
+  gl.viewport(0, 0, sourceCanvas.width, sourceCanvas.height);
   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
@@ -103,8 +105,8 @@ function drawGreenscreen({ webcamRes, sourceCanvas, params }) {
     sourceCanvas
   );
   gl.uniform1i(texLoc, 0);
-  gl.uniform1f(texWidthLoc, webcamRes.w);
-  gl.uniform1f(texHeightLoc, webcamRes.h);
+  gl.uniform1f(texWidthLoc, sourceCanvas.width);
+  gl.uniform1f(texHeightLoc, sourceCanvas.height);
   const m = params.keyColor.match(/^#([0-9a-f]{6})$/i)[1];
   gl.uniform3f(
     keyColorLoc,
@@ -160,38 +162,18 @@ function setUpCamera(webcamRes) {
 }
 
 let cameraSetUp = false;
+const useMediaPipe = false;
 
-// draw loop
-export function draw({ webcamRes, params, img1 }) {
-  // if (!params) reloadAfterMs();
-
-  if (video.srcObject && !video.srcObject.active) {
-    reloadAfterMs();
-  }
-
-  if (!cameraSetUp && video) {
-    cameraSetUp = true;
-    setUpCamera(webcamRes);
-  }
-
-  const frameCanvas = getFlippedVideoCanvas({
-    canvas: selfieCanvas,
-    w: webcamRes.w,
-    h: webcamRes.h,
-    flipX: true,
-    flipY: false,
-  });
-
-  drawGreenscreen({ webcamRes, sourceCanvas: frameCanvas, params });
+function drawGlFxCanvas({ sourceCanvas, params }) {
+  if (!sourceCanvas) return;
 
   if (!glfxCanvas) {
     // fx loaded in index.html script tag
     glfxCanvas = fx.canvas();
   }
 
-  if (glfxCanvas && frameCanvas) {
-    texture = glfxCanvas.texture(greenscreenCanvas);
-    // texture = glfxCanvas.texture(frameCanvas);
+  if (glfxCanvas && sourceCanvas) {
+    texture = glfxCanvas.texture(sourceCanvas);
     let gc = glfxCanvas.draw(texture);
     gc.sepia(params.sepia);
 
@@ -216,24 +198,50 @@ export function draw({ webcamRes, params, img1 }) {
 
     gc.update();
   }
+}
 
-  const { w, h } = webcamRes;
+// draw loop
+export function draw({ webcamRes, params, img1 }) {
+  // if (!params) reloadAfterMs();
+
+  if (video.srcObject && !video.srcObject.active) {
+    reloadAfterMs();
+    return;
+  }
+
+  if (useMediaPipe && !cameraSetUp) {
+    cameraSetUp = true;
+    setUpCamera(webcamRes);
+  }
+
+  // const { w, h } = webcamRes;
+  // const inLeft = w * params.cropLeft;
+  // const inRight = w * params.cropRight;
+  // const inTop = h * params.cropTop;
+  // const inBottom = h * params.cropBottom;
+
+  const frameCanvas = getFlippedVideoCanvas({
+    canvas: useMediaPipe ? selfieCanvas : null,
+    video: useMediaPipe ? null : video,
+    crop: {
+      left: params.cropLeft,
+      right: params.cropRight,
+      top: params.cropTop,
+      bottom: params.cropBottom,
+    },
+    scale: params.size,
+    flipX: true,
+    flipY: false,
+  });
+
+  drawGreenscreen({ sourceCanvas: frameCanvas, params });
+  drawGlFxCanvas({ sourceCanvas: greenscreenCanvas, params });
+
   artCanvas.width = 1280;
   artCanvas.height = 720;
 
-  const inLeft = w * params.cropLeft;
-  const inRight = w * params.cropRight;
-  const inTop = h * params.cropTop;
-  const inBottom = h * params.cropBottom;
-  const inWidth = w - (inLeft + inRight);
-  const inHeight = h - (inTop + inBottom);
-
-  const wToHRatio = artCanvas.height / artCanvas.width;
-
-  const outLeft = params.left * w;
-  const outTop = params.top * h;
-  const outWidth = params.size * inWidth;
-  const outHeight = wToHRatio * outWidth;
+  const outLeft = params.left * artCanvas.width;
+  const outTop = params.top * artCanvas.height;
 
   // draw image
   artCtx.drawImage(
@@ -251,80 +259,20 @@ export function draw({ webcamRes, params, img1 }) {
   // draw webcam image
   artCtx.save();
   artCtx.globalAlpha = 0.8;
-  artCtx.drawImage(
-    glfxCanvas,
-    inLeft,
-    inTop,
-    inWidth,
-    inHeight,
-    outLeft,
-    outTop,
-    outWidth,
-    outHeight
-  );
+
+  artCtx.drawImage(glfxCanvas, outLeft, outTop);
 
   // artCtx.drawImage(selfieCanvas, 0, 0);
   // artCtx.drawImage(greenscreenCanvas, 0, 0);
-  // artCtx.drawImage(frameCanvas, 0, 0);
+  // if (frameCanvas) {
+  //   artCtx.drawImage(frameCanvas, 0, 0);
+  // }
 
   // controls
   videoColorSelector.style.display = params.showColorDropper
     ? "inherit"
     : "none";
 }
-
-/*
- if (currFilter === "ink") 
- {fxCanvas.draw(texture).ink(inkLevel).update();
- }
-if (currFilter === "edges") {
-  fxCanvas.draw(texture).edgeWork(edgeLevel).update();
-}
-if (currFilter === "swirl") {
-  fxCanvas
-    .draw(texture)
-    .swirl(380, 240, 200, parseFloat(swirlAngle))
-    .update();
-}
-if (currFilter === "tiltshift") {
-  fxCanvas
-    .draw(texture)
-    .tiltShift(96, 359.25, 480, 287.4, 15, 200)
-    .update();
-}
-if (currFilter === "bulge") {
-  fxCanvas.draw(texture).bulgePinch(320, 239.5, 242, 0.63).update();
-}
-if (currFilter === "pinch") {
-  fxCanvas.draw(texture).bulgePinch(320, 239.5, 242, -0.6).update();
-}
-if (currFilter === "colourhalftone") {
-  fxCanvas.draw(texture).colorHalftone(320, 239.5, 0.87, 5).update();
-}
-if (currFilter === "halftone") {
-  fxCanvas.draw(texture).dotScreen(320, 239.5, 1.1, 4).update();
-}
-if (currFilter === "hexpixels") {
-  fxCanvas.draw(texture).hexagonalPixelate(320, 239.5, 40).update();
-}
-if (currFilter === "unsharp") {
-  fxCanvas.draw(texture).unsharpMask(15, 5).update();
-}
-if (currFilter === "denoise") {
-  fxCanvas.draw(texture).denoise(denoiseLevel).update();
-}
-if (currFilter === "huesat") {
-  fxCanvas.draw(texture).hueSaturation(0, 1).triangleBlur(30).update();
-}
-if (currFilter === "experiment") {
-  fxCanvas
-    .draw(texture)
-    .hueSaturation(0, 0.5)
-    .denoise(denoiseLevel)
-    .ink(inkLevel)
-    .update();
-}
-*/
 
 // Extended Array
 const paletteArray = [
