@@ -15,7 +15,7 @@ const greenscreenCanvas = setupGreenScreenShader();
 const glfxCanvas = setupGlfxCanvas();
 
 // draw loop
-export function draw({ webcamRes, params, img1 }) {
+export function draw({ artworkSize, params, img }) {
   // if (!params) reloadAfterMs();
 
   if (video.srcObject && !video.srcObject.active) {
@@ -38,7 +38,7 @@ export function draw({ webcamRes, params, img1 }) {
 
   drawGreenscreen({ sourceCanvas: frameCanvas, params });
   drawGlFxCanvas({ sourceCanvas: greenscreenCanvas, params });
-  drawArtCanvas({ sourceCanvas: glfxCanvas, params, img: img1 });
+  drawArtCanvas({ sourceCanvas: glfxCanvas, params, img, ...artworkSize });
 
   // controls
   videoColorSelector.style.display = params.showColorDropper

@@ -27,7 +27,12 @@ body {
   left: 0;
 }
 
+#paintingBgCanvas {
+  position: absolute;
+}
+
 #artCanvas {
+  position: absolute;
   max-height: 100vh;
   display: inline-block;
   line-height: 0;
