@@ -31,7 +31,7 @@ export function getFlippedVideoCanvas({
 
   if (inW < 1 || inH < 1) {
     console.log("CROPPED TO BELOW ZERO H or W");
-    return;
+    return null;
   }
 
   const outW = inW * scale;
@@ -39,7 +39,7 @@ export function getFlippedVideoCanvas({
 
   if (outW < 1 || outH < 1) {
     console.log("SCALED BELOW ZERO H or W");
-    return;
+    return null;
   }
 
   const frameCanvas = document.createElement("canvas");

@@ -1,6 +1,6 @@
 import { draw } from "./app.js";
 import { setupControls } from "./controls.js";
-import { setup } from "./setupWebcam.js";
+import { setup } from "./utils/setupWebcam.js";
 
 let stats;
 
