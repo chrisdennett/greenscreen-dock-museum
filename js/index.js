@@ -3,8 +3,8 @@ import { setupControls } from "./controls.js";
 import { setup } from "./utils/setupWebcam.js";
 
 // const webcamRes = { w: 800, h: 600 };
-// const webcamRes = { w: 320, h: 240 };
-const webcamRes = { w: 640, h: 480 };
+const webcamRes = { w: 320, h: 240 };
+// const webcamRes = { w: 640, h: 480 };
 const artworkSize = { w: 1280, h: 720 };
 
 const paintingBgCanvas = document.getElementById("paintingBgCanvas");

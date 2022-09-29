@@ -44,7 +44,7 @@ export function setupControls() {
   position.add(params, "cropBottom").min(0).max(1).step(0.001);
   position.add(params, "left").min(0).max(1).step(0.001);
   position.add(params, "top").min(0).max(1).step(0.001);
-  position.add(params, "size").min(0).max(1).step(0.001);
+  position.add(params, "size").min(0).max(4).step(0.001);
 
   const chromaKey = gui.addFolder("chromaKey");
   chromaKey.add(params, "showColorDropper");
