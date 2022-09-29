@@ -2,31 +2,34 @@ import { draw } from "./app.js";
 import { setupControls } from "./controls.js";
 import { setup } from "./utils/setupWebcam.js";
 
-// const webcamRes = { w: 800, h: 600 };
-const webcamRes = { w: 320, h: 240 };
+const webcamRes = { w: 160, h: 120 };
+// const webcamRes = { w: 320, h: 240 };
 // const webcamRes = { w: 640, h: 480 };
-const artworkSize = { w: 1280, h: 720 };
+// const webcamRes = { w: 800, h: 600 };
+const artworkSize = { w: 1270, h: 1691 };
 
-const paintingBgCanvas = document.getElementById("paintingBgCanvas");
-paintingBgCanvas.width = artworkSize.w;
-paintingBgCanvas.height = artworkSize.h;
-const paintingBgCtx = paintingBgCanvas.getContext("2d");
-const img1 = await loadImage("/img/AlbumPainting_01.jpg");
-paintingBgCtx.drawImage(
-  img1,
-  0,
-  0,
-  img1.width,
-  img1.height,
-  0,
-  0,
-  artworkSize.w,
-  artworkSize.h
-);
+// const paintingBgCanvas = document.getElementById("paintingBgCanvas");
+// paintingBgCanvas.width = artworkSize.w;
+// paintingBgCanvas.height = artworkSize.h;
+// const paintingBgCtx = paintingBgCanvas.getContext("2d");
+const img1 = await loadImage("/img/Loose_01_1270x1650.jpg");
+// const img1 = await loadImage("/img/Loose_09_1270x1691.jpg");
+// const img1 = await loadImage("/img/AlbumPainting_01.jpg");
+// paintingBgCtx.drawImage(
+//   img1,
+//   0,
+//   0,
+//   img1.width,
+//   img1.height,
+//   0,
+//   0,
+//   artworkSize.w,
+//   artworkSize.h
+// );
 
 let stats;
 
-addFps();
+// addFps();
 const params = setupControls();
 setup(webcamRes);
 doDraw();
