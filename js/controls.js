@@ -76,7 +76,97 @@ export function setupControls() {
   chromaKey.closed = true;
   filters.closed = true;
 
+  gui.preset = "Default";
+  gui.closed = false;
+  gui.remembered = {
+    Default: {
+      0: {
+        cropLeft: 0,
+        cropRight: 0,
+        cropTop: 0,
+        cropBottom: 0,
+        left: 0.346,
+        top: 0.247,
+        size: 1,
+        showColorDropper: false,
+        keyColor: "#55ba18",
+        keySimilarity: 0,
+        keySmoothness: 0.236,
+        keySpill: 0.203,
+        brightness: 0.222,
+        contrast: 0.2,
+        denoise: 69,
+        hue: 0,
+        saturation: 0,
+        noise: 0,
+        sepia: 0,
+        unsharpRadius: 0,
+        unsharpStrength: 0,
+        vibrance: 0,
+        lensBlurRadius: 0,
+        lensBlurBrightness: 0,
+        lensBlurAngle: 0,
+        triangleBlur: 3,
+        edgeWork: 0,
+        ink: 0,
+      },
+    },
+    watercolour1: {
+      0: {
+        brightness: 0.266,
+        contrast: 0.112,
+        denoise: 0,
+        hue: -0.109,
+        saturation: -0.263,
+        noise: 0.016,
+        sepia: 0.225,
+        unsharpRadius: 23,
+        unsharpStrength: 15,
+        vibrance: -1,
+        lensBlurRadius: 0,
+        lensBlurBrightness: -0.418,
+        lensBlurAngle: 0.742,
+        triangleBlur: 0,
+        edgeWork: 0,
+        ink: 0,
+      },
+    },
+    watercolour2: {
+      0: {
+        cropLeft: 0,
+        cropRight: 0,
+        cropTop: 0,
+        cropBottom: 0,
+        left: 0.49,
+        top: 0.501,
+        size: 0.8210000000000001,
+        showColorDropper: false,
+        keyColor: "#20e4cd",
+        keySimilarity: 0.214,
+        keySmoothness: 0.08,
+        keySpill: 0.1,
+        brightness: 0.134,
+        contrast: 0.178,
+        denoise: 15,
+        hue: 0,
+        saturation: 0,
+        noise: 0,
+        sepia: 0.28,
+        unsharpRadius: 0,
+        unsharpStrength: 0,
+        vibrance: 0.354,
+        lensBlurRadius: 0,
+        lensBlurBrightness: 0,
+        lensBlurAngle: 0,
+        triangleBlur: 0,
+        edgeWork: 0,
+        ink: 0,
+      },
+    },
+  };
+
   const keyColorSelector = document.querySelector("#keyColorSelector");
+
   keyColorSelector.value = params.keyColor;
   keyColorSelector.addEventListener(
     "input",

@@ -38,7 +38,7 @@ export function drawArtCanvas({ sourceCanvas, params, w, h, img }) {
 
   ghostCtx.save();
   ghostCtx.drawImage(artCanvas, 0, 0);
-  ghostCtx.globalAlpha = 0.03;
+  ghostCtx.globalAlpha = 0.05;
   // ghostCtx.globalCompositeOperation = "destination-in";
   ghostCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, w, h);
   ghostCtx.restore();
