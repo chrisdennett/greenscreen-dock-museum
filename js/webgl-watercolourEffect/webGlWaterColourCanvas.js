@@ -7,10 +7,12 @@ export class webGlWaterColourCanvas {
     this.gl;
     this.prog;
     this.texLoc;
-    this.keyColorLoc;
-    this.similarityLoc;
-    this.smoothnessLoc;
-    this.spillLoc;
+    this.brightnessLoc;
+    this.contrastLoc;
+    this.sepiaLoc;
+    this.vibranceLoc;
+    this.blurLoc;
+    this.useStaticValues;
 
     this.setup({ w, h });
   }
@@ -152,10 +154,15 @@ export class webGlWaterColourCanvas {
     );
 
     // set up param locations in shader
-    this.keyColorLoc = this.gl.getUniformLocation(this.prog, "keyColor");
-    this.similarityLoc = this.gl.getUniformLocation(this.prog, "similarity");
-    this.smoothnessLoc = this.gl.getUniformLocation(this.prog, "smoothness");
-    this.spillLoc = this.gl.getUniformLocation(this.prog, "spill");
+    this.brightnessLoc = this.gl.getUniformLocation(this.prog, "brightness");
+    this.contrastLoc = this.gl.getUniformLocation(this.prog, "contrast");
+    this.sepiaLoc = this.gl.getUniformLocation(this.prog, "sepia");
+    this.vibranceLoc = this.gl.getUniformLocation(this.prog, "vibrance");
+    this.blurLoc = this.gl.getUniformLocation(this.prog, "blur");
+    this.useStaticValues = this.gl.getUniformLocation(
+      this.prog,
+      "useStaticValues"
+    );
 
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
@@ -177,18 +184,12 @@ export class webGlWaterColourCanvas {
     );
     this.gl.uniform1i(this.texLoc, 0);
 
-    const m = params.keyColor.match(/^#([0-9a-f]{6})$/i)[1];
-    this.gl.uniform3f(
-      this.keyColorLoc,
-      parseInt(m.substr(0, 2), 16) / 255,
-      parseInt(m.substr(2, 2), 16) / 255,
-      parseInt(m.substr(4, 2), 16) / 255
-    );
-
-    this.gl.uniform1f(this.similarityLoc, params.keySimilarity);
-
-    this.gl.uniform1f(this.smoothnessLoc, params.keySmoothness);
-    this.gl.uniform1f(this.spillLoc, params.keySpill);
+    this.gl.uniform1f(this.brightnessLoc, params.brightness);
+    this.gl.uniform1f(this.contrastLoc, params.contrast);
+    this.gl.uniform1f(this.sepiaLoc, params.sepia);
+    this.gl.uniform1f(this.vibranceLoc, params.vibrance);
+    this.gl.uniform1f(this.blurLoc, params.blur);
+    this.gl.uniform1i(this.useStaticValues, params.useStaticValues);
 
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);

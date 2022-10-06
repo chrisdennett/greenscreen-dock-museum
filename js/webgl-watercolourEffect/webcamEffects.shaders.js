@@ -7,6 +7,13 @@ precision mediump float;
 uniform sampler2D tex;
 varying vec2 v_texCoord;
 
+uniform bool useStaticValues;
+uniform float brightness;
+uniform float contrast;
+uniform float sepia;
+uniform float vibrance;
+uniform float blur;
+
 vec4 getWebcamColour(sampler2D webcamColour, vec2 texCoord){
     return texture2D(webcamColour, texCoord);
 }
@@ -33,8 +40,7 @@ vec4 Posterize(in vec4 inputColor){
     return vec4(c, inputColor.a);
 }
 
-vec4 getSepiaColour(vec4 currColour){
-    float amount = 0.5;
+vec4 getSepiaColour(vec4 currColour, float amount){
     vec4 outColour = currColour;
 
     float r = currColour.r;
@@ -104,15 +110,25 @@ vec4 getVibrance(vec4 currColour, float amount){
     
 void main(void) {
 
-    float brightness = 0.134;
-    float contrast = 0.178;
-    float vibrance = 0.354;
+    float _brightness = -0.084;
+    float _contrast = -0.021;
+    float _sepia = 0.236;
+    float _vibrance = 0.862;
+    float _blur = 0.013;
+
+    if(!useStaticValues){
+        _brightness = brightness;
+        _contrast = contrast;
+        _vibrance = vibrance;
+        _blur = blur;
+        _sepia = sepia;
+    }
 
     // vec4 webcamColour = getWebcamColour(tex, v_texCoord);
-    vec4 blurredColour = getBlurredColour(0.02, v_texCoord);
-    vec4 sepiaColour = getSepiaColour(blurredColour);
-    vec4 brightnessContrastColour = getBrightnessContrast(sepiaColour, brightness, contrast);
-    vec4 vibranceColour = getVibrance(brightnessContrastColour, vibrance);
+    vec4 blurredColour = getBlurredColour(_blur, v_texCoord);
+    vec4 sepiaColour = getSepiaColour(blurredColour, _sepia);
+    vec4 brightnessContrastColour = getBrightnessContrast(sepiaColour, _brightness, _contrast);
+    vec4 vibranceColour = getVibrance(brightnessContrastColour, _vibrance);
 
     vec4 posterizedColour = Posterize(vibranceColour);
 

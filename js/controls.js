@@ -82,7 +82,7 @@ export function setupControls() {
   // starting folder state
   position.closed = true;
   chromaKey.closed = true;
-  filters.closed = true;
+  filters.closed = false;
 
   gui.preset = "Default";
   gui.closed = false;
