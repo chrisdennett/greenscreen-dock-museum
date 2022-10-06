@@ -5,14 +5,24 @@ import {
   drawGreenscreen,
   setupGreenScreenShader,
 } from "./utils/drawGreenscreen.js";
-import { drawGlFxCanvas, setupGlfxCanvas } from "./utils/drawGlFxCanvas.js";
+import { webGLGreenScreenCanvas } from "./utils/webGLGreenScreenCanvas.js";
+// import { drawGlFxCanvas, setupGlfxCanvas } from "./utils/drawGlFxCanvas.js";
 
 // app elements
+
+const inCanvas = document.getElementById("inCanvas");
+
 const videoColorSelector = document.querySelector("#videoHolder");
 const video = document.querySelector("#videoElement");
 
-const greenscreenCanvas = setupGreenScreenShader();
-const glfxCanvas = setupGlfxCanvas();
+const inWebGlCanvas = new webGLGreenScreenCanvas({
+  canvas: inCanvas,
+  w: 1270,
+  h: 1691,
+});
+
+const greenscreenCanvas = setupGreenScreenShader({ w: 1270, h: 1691 });
+// const glfxCanvas = setupGlfxCanvas();
 
 // draw loop
 export function draw({ artworkSize, params, img }) {
@@ -36,9 +46,16 @@ export function draw({ artworkSize, params, img }) {
     flipY: false,
   });
 
-  drawGreenscreen({ sourceCanvas: frameCanvas, params });
-  drawGlFxCanvas({ sourceCanvas: greenscreenCanvas, params });
-  drawArtCanvas({ sourceCanvas: glfxCanvas, params, img, ...artworkSize });
+  inWebGlCanvas.update({ sourceCanvas: frameCanvas, params });
+
+  drawGreenscreen({ sourceCanvas: inCanvas, params });
+  // drawGlFxCanvas({ sourceCanvas: greenscreenCanvas, params });
+  drawArtCanvas({
+    sourceCanvas: greenscreenCanvas,
+    params,
+    img,
+    ...artworkSize,
+  });
 
   // controls
   videoColorSelector.style.display = params.showColorDropper

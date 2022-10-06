@@ -1,12 +1,9 @@
-import { vert, frag } from "../../shaders/greenscreen.shaders.js";
+import { vert, frag } from "../../shaders/webcamEffects.shaders.js";
 
 const greenscreenCanvas = document.createElement("canvas");
 let gl;
 let prog;
-// GREEN SCREEN CODE
 let texLoc;
-let texWidthLoc;
-let texHeightLoc;
 let keyColorLoc;
 let similarityLoc;
 let smoothnessLoc;
@@ -27,8 +24,7 @@ export function drawGreenscreen({ sourceCanvas, params }) {
     sourceCanvas
   );
   gl.uniform1i(texLoc, 0);
-  gl.uniform1f(texWidthLoc, sourceCanvas.width);
-  gl.uniform1f(texHeightLoc, sourceCanvas.height);
+
   const m = params.keyColor.match(/^#([0-9a-f]{6})$/i)[1];
   gl.uniform3f(
     keyColorLoc,
@@ -37,24 +33,30 @@ export function drawGreenscreen({ sourceCanvas, params }) {
     parseInt(m.substr(4, 2), 16) / 255
   );
 
-  // gl.uniform4f(u_colorLocation, 1, 0, 1, 0.5);
-  // gl.uniform3fv(u_colorLocation, getPalette());
-
   gl.uniform1f(similarityLoc, params.keySimilarity);
 
   gl.uniform1f(smoothnessLoc, params.keySmoothness);
   gl.uniform1f(spillLoc, params.keySpill);
-  gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+
+  // Draw the rectangle.
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
-export function setupGreenScreenShader() {
+export function setupGreenScreenShader({ w, h }) {
   gl = greenscreenCanvas.getContext("webgl", { premultipliedAlpha: false });
+
+  greenscreenCanvas.width = w;
+  greenscreenCanvas.height = h;
+
+  // prog
   prog = gl.createProgram();
 
+  // vert shader
   const vs = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vs, vert);
   gl.compileShader(vs);
 
+  // frag shader
   const fs = gl.createShader(gl.FRAGMENT_SHADER);
   gl.shaderSource(fs, frag);
   gl.compileShader(fs);
@@ -62,148 +64,119 @@ export function setupGreenScreenShader() {
     console.error(gl.getShaderInfoLog(fs));
   }
 
+  // connect everything up
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
-  gl.useProgram(prog);
 
-  const vb = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vb);
+  // look up where the vertex data needs to go.
+  var positionLocation = gl.getAttribLocation(prog, "a_position");
+  var texcoordLocation = gl.getAttribLocation(prog, "a_texCoord");
+
+  // Create a buffer to put three 2d clip space points in
+  const positionBuffer = gl.createBuffer();
+
+  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+  // Set a rectangle the same size as the image.
+  setRectangle(gl, 0, 0, w, h);
+
+  // provide texture coordinates for the rectangle.
+  var texcoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Float32Array([-1, 1, -1, -1, 1, -1, 1, 1]),
+    new Float32Array([
+      0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0,
+    ]),
     gl.STATIC_DRAW
   );
 
-  const coordLoc = gl.getAttribLocation(prog, "c");
-  gl.vertexAttribPointer(coordLoc, 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(coordLoc);
-
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.activeTexture(gl.TEXTURE0);
-  const tex = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, tex);
-
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
+  // lookup uniforms
+  var resolutionLocation = gl.getUniformLocation(prog, "u_resolution");
+
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+  // Clear the canvas
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  // Tell it to use our prog (pair of shaders)
+  gl.useProgram(prog);
+
+  // Turn on the position attribute
+  gl.enableVertexAttribArray(positionLocation);
+
+  // Bind the position buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+  // Tell the position attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+  var size = 2; // 2 components per iteration
+  var type = gl.FLOAT; // the data is 32bit floats
+  var normalize = false; // don't normalize the data
+  var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+  var offset = 0; // start at the beginning of the buffer
+  gl.vertexAttribPointer(
+    positionLocation,
+    size,
+    type,
+    normalize,
+    stride,
+    offset
+  );
+
+  // Turn on the texcoord attribute
+  gl.enableVertexAttribArray(texcoordLocation);
+
+  // bind the texcoord buffer.
+  gl.bindBuffer(gl.ARRAY_BUFFER, texcoordBuffer);
+
+  // Tell the texcoord attribute how to get data out of texcoordBuffer (ARRAY_BUFFER)
+  var size = 2; // 2 components per iteration
+  var type = gl.FLOAT; // the data is 32bit floats
+  var normalize = false; // don't normalize the data
+  var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+  var offset = 0; // start at the beginning of the buffer
+  gl.vertexAttribPointer(
+    texcoordLocation,
+    size,
+    type,
+    normalize,
+    stride,
+    offset
+  );
+
+  // set the resolution
+  gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+
   // set up param locations in shader
-  texLoc = gl.getUniformLocation(prog, "tex");
-  texWidthLoc = gl.getUniformLocation(prog, "texWidth");
-  texHeightLoc = gl.getUniformLocation(prog, "texHeight");
   keyColorLoc = gl.getUniformLocation(prog, "keyColor");
   similarityLoc = gl.getUniformLocation(prog, "similarity");
   smoothnessLoc = gl.getUniformLocation(prog, "smoothness");
   spillLoc = gl.getUniformLocation(prog, "spill");
 
+  // Draw the rectangle.
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+
   return greenscreenCanvas;
 }
 
-// Unused Palette Code - for greenscreen webgl if used
-/*
-function getPalette() {
-  let combinedArr = [];
-
-  for (let p of paletteArray) {
-    const [r, g, b] = p.rgb;
-
-    combinedArr.push(r / 255, g / 255, b / 255);
-  }
-
-  return combinedArr;
+function setRectangle(gl, x, y, width, height) {
+  var x1 = x;
+  var x2 = x + width;
+  var y1 = y;
+  var y2 = y + height;
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]),
+    gl.STATIC_DRAW
+  );
 }
-
-
-const paletteArray = [
-  {
-    name: "Rhythm",
-    hex: "6B799E",
-    rgb: [107, 121, 158],
-    cmyk: [32, 23, 0, 38],
-    hsb: [224, 32, 62],
-    hsl: [224, 21, 52],
-    lab: [51, 4, -22],
-  },
-  {
-    name: "Metallic Sunburst",
-    hex: "AA8448",
-    rgb: [170, 132, 72],
-    cmyk: [0, 22, 58, 33],
-    hsb: [37, 58, 67],
-    hsl: [37, 40, 47],
-    lab: [58, 7, 38],
-  },
-  {
-    name: "Laurel Green",
-    hex: "A4B29A",
-    rgb: [164, 178, 154],
-    cmyk: [8, 0, 13, 30],
-    hsb: [95, 13, 70],
-    hsl: [95, 13, 65],
-    lab: [71, -9, 11],
-  },
-  {
-    name: "Kombu Green",
-    hex: "35463F",
-    rgb: [53, 70, 63],
-    cmyk: [24, 0, 10, 73],
-    hsb: [155, 24, 27],
-    hsl: [155, 14, 24],
-    lab: [28, -8, 2],
-  },
-  {
-    name: "Spanish Bistre",
-    hex: "777242",
-    rgb: [119, 114, 66],
-    cmyk: [0, 4, 45, 53],
-    hsb: [54, 45, 47],
-    hsl: [54, 29, 36],
-    lab: [47, -6, 27],
-  },
-  {
-    name: "Sage",
-    hex: "BDB88F",
-    rgb: [189, 184, 143],
-    cmyk: [0, 3, 24, 26],
-    hsb: [53, 24, 74],
-    hsl: [53, 26, 65],
-    lab: [74, -5, 22],
-  },
-  {
-    name: "Timberwolf",
-    hex: "CECCC1",
-    rgb: [206, 204, 193],
-    cmyk: [0, 1, 6, 19],
-    hsb: [51, 6, 81],
-    hsl: [51, 12, 78],
-    lab: [82, -1, 6],
-  },
-  {
-    name: "Camel",
-    hex: "AF985C",
-    rgb: [175, 152, 92],
-    cmyk: [0, 13, 47, 31],
-    hsb: [43, 47, 69],
-    hsl: [43, 34, 52],
-    lab: [64, 0, 35],
-  },
-  {
-    name: "China Rose",
-    hex: "AA5062",
-    rgb: [170, 80, 98],
-    cmyk: [0, 53, 42, 33],
-    hsb: [348, 53, 67],
-    hsl: [348, 36, 49],
-    lab: [46, 39, 7],
-  },
-  {
-    name: "Morning Blue",
-    hex: "769A8E",
-    rgb: [118, 154, 142],
-    cmyk: [23, 0, 8, 40],
-    hsb: [160, 23, 60],
-    hsl: [160, 15, 53],
-    lab: [61, -15, 2],
-  },
-];
-*/

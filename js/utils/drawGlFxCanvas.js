@@ -21,7 +21,7 @@ export function drawGlFxCanvas({ sourceCanvas, params }) {
   // );
   gc.triangleBlur(params.triangleBlur);
   gc.brightnessContrast(params.brightness, params.contrast);
-  gc.denoise(params.denoise);
+  // gc.denoise(params.denoise);
   // gc.hueSaturation(params.hue, params.saturation);
   // gc.unsharpMask(params.unsharpRadius, params.unsharpStrength);
   gc.vibrance(params.vibrance);
