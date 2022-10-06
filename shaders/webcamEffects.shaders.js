@@ -90,20 +90,31 @@ vec4 getBrightnessContrast(vec4 currColour, float brightness, float contrast){
     
     return outColour;
 }
-  
+
+vec4 getVibrance(vec4 currColour, float amount){
+    vec4 outColour = currColour;
+
+    float average = (outColour.r + outColour.g + outColour.b) / 3.0;
+    float mx = max(outColour.r, max(outColour.g, outColour.b));
+    float amt = (mx - average) * (-amount * 3.0);
+    outColour.rgb = mix(outColour.rgb, vec3(mx), amt);
+    
+    return outColour;
+}
     
 void main(void) {
 
-    float brightness = 0.156;
-    float contrast = -0.175;
+    float brightness = 0.134;
+    float contrast = 0.178;
     float vibrance = 0.354;
 
-    vec4 webcamColour = getWebcamColour(tex, v_texCoord);
-    vec4 blurredColour = getBlurredColour(0.001, v_texCoord);
-    vec4 brightnessContrastColour = getBrightnessContrast(blurredColour, brightness, contrast);
+    // vec4 webcamColour = getWebcamColour(tex, v_texCoord);
+    vec4 blurredColour = getBlurredColour(0.02, v_texCoord);
+    vec4 sepiaColour = getSepiaColour(blurredColour);
+    vec4 brightnessContrastColour = getBrightnessContrast(sepiaColour, brightness, contrast);
+    vec4 vibranceColour = getVibrance(brightnessContrastColour, vibrance);
 
-    vec4 sepiaColour = getSepiaColour(brightnessContrastColour);
-    vec4 posterizedColour = Posterize(sepiaColour);
+    vec4 posterizedColour = Posterize(vibranceColour);
 
     gl_FragColor = posterizedColour;
 }
