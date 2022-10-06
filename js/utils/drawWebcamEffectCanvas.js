@@ -9,7 +9,7 @@ let similarityLoc;
 let smoothnessLoc;
 let spillLoc;
 
-export function drawGreenscreen({ sourceCanvas, params }) {
+export function drawWebcamEffectsShader({ sourceCanvas, params }) {
   if (!sourceCanvas) return;
 
   greenscreenCanvas.width = sourceCanvas.width;
@@ -42,7 +42,7 @@ export function drawGreenscreen({ sourceCanvas, params }) {
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
-export function setupGreenScreenShader({ w, h }) {
+export function setupWebcamEffectsShader({ w, h }) {
   gl = greenscreenCanvas.getContext("webgl", { premultipliedAlpha: false });
 
   greenscreenCanvas.width = w;

@@ -1,5 +1,4 @@
 const params = {
-  showColorDropper: false,
   cropLeft: 0.1,
   cropRight: 0.15,
   cropTop: 0.1,
@@ -7,27 +6,33 @@ const params = {
   left: 0.3,
   top: 0.3,
   size: 1,
+
+  showColorDropper: false,
   keyColor: "#15cb99",
   keySimilarity: 0.4,
   keySmoothness: 0.08,
   keySpill: 0.1,
+
+  useStaticValues: false,
   brightness: 0,
   contrast: 0,
-  denoise: 100,
-  hue: 0,
-  saturation: 0,
-  noise: 0,
   sepia: 0,
-  unsharpRadius: 0,
-  unsharpStrength: 0,
   vibrance: 0,
-  vibranceStrength: 0,
-  lensBlurRadius: 0,
-  lensBlurBrightness: 1,
-  lensBlurAngle: 0,
-  triangleBlur: 0,
-  edgeWork: 0,
-  ink: 0,
+  blur: 0.01,
+
+  // saturation: 0,
+  // denoise: 100,
+  // hue: 0,
+  // noise: 0,
+  // unsharpRadius: 0,
+  // unsharpStrength: 0,
+  // vibranceStrength: 0,
+  // lensBlurRadius: 0,
+  // lensBlurBrightness: 1,
+  // lensBlurAngle: 0,
+  // triangleBlur: 0,
+  // edgeWork: 0,
+  // ink: 0,
 };
 
 // SET UP CONTROLS
@@ -54,22 +59,25 @@ export function setupControls() {
   chromaKey.add(params, "keySpill").min(0).max(1).step(0.001);
 
   const filters = gui.addFolder("filters");
+  filters.add(params, "useStaticValues");
   filters.add(params, "brightness").min(-1).max(1).step(0.001);
   filters.add(params, "contrast").min(-1).max(1).step(0.001);
-  filters.add(params, "denoise").min(0).max(100).step(1);
-  filters.add(params, "hue").min(-1).max(1).step(0.001);
-  filters.add(params, "saturation").min(-1).max(1).step(0.001);
-  filters.add(params, "noise").min(0).max(1).step(0.001);
   filters.add(params, "sepia").min(0).max(1).step(0.001);
-  filters.add(params, "unsharpRadius").min(0).max(100).step(1);
-  filters.add(params, "unsharpStrength").min(0).max(100).step(1);
   filters.add(params, "vibrance").min(-1).max(1).step(0.001);
-  filters.add(params, "lensBlurRadius").min(0).max(50).step(1);
-  filters.add(params, "lensBlurBrightness").min(-1).max(1).step(0.001);
-  filters.add(params, "lensBlurAngle").min(0).max(3.1416).step(0.001);
-  filters.add(params, "triangleBlur").min(0).max(200).step(1);
-  filters.add(params, "edgeWork").min(0).max(200).step(1);
-  filters.add(params, "ink").min(0).max(1).step(0.001);
+  filters.add(params, "blur").min(0).max(0.5).step(0.001);
+
+  // filters.add(params, "saturation").min(-1).max(1).step(0.001);
+  // filters.add(params, "denoise").min(0).max(100).step(1);
+  // filters.add(params, "hue").min(-1).max(1).step(0.001);
+  // filters.add(params, "noise").min(0).max(1).step(0.001);
+  // filters.add(params, "unsharpRadius").min(0).max(100).step(1);
+  // filters.add(params, "unsharpStrength").min(0).max(100).step(1);
+  // filters.add(params, "lensBlurRadius").min(0).max(50).step(1);
+  // filters.add(params, "lensBlurBrightness").min(-1).max(1).step(0.001);
+  // filters.add(params, "lensBlurAngle").min(0).max(3.1416).step(0.001);
+  // filters.add(params, "triangleBlur").min(0).max(200).step(1);
+  // filters.add(params, "edgeWork").min(0).max(200).step(1);
+  // filters.add(params, "ink").min(0).max(1).step(0.001);
 
   // starting folder state
   position.closed = true;
@@ -139,7 +147,7 @@ export function setupControls() {
         cropBottom: 0,
         left: 0.49,
         top: 0.501,
-        size: 0.8210000000000001,
+        size: 0.821,
         showColorDropper: false,
         keyColor: "#20e4cd",
         keySimilarity: 0.214,

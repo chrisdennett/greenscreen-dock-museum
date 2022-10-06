@@ -2,14 +2,12 @@ import { getFlippedVideoCanvas } from "./utils/getFlippedVideoCanvas.js";
 import { reloadAfterMs } from "./utils/setupWebcam.js";
 import { drawArtCanvas } from "./utils/drawArtCanvas.js";
 import {
-  drawGreenscreen,
-  setupGreenScreenShader,
-} from "./utils/drawGreenscreen.js";
+  drawWebcamEffectsShader,
+  setupWebcamEffectsShader,
+} from "./utils/drawWebcamEffectCanvas.js";
 import { webGLGreenScreenCanvas } from "./utils/webGLGreenScreenCanvas.js";
-// import { drawGlFxCanvas, setupGlfxCanvas } from "./utils/drawGlFxCanvas.js";
 
 // app elements
-
 const inCanvas = document.getElementById("inCanvas");
 
 const videoColorSelector = document.querySelector("#videoHolder");
@@ -21,8 +19,7 @@ const inWebGlCanvas = new webGLGreenScreenCanvas({
   h: 1691,
 });
 
-const greenscreenCanvas = setupGreenScreenShader({ w: 1270, h: 1691 });
-// const glfxCanvas = setupGlfxCanvas();
+const webcamEffectsCanvas = setupWebcamEffectsShader({ w: 1270, h: 1691 });
 
 // draw loop
 export function draw({ artworkSize, params, img }) {
@@ -48,10 +45,9 @@ export function draw({ artworkSize, params, img }) {
 
   inWebGlCanvas.update({ sourceCanvas: frameCanvas, params });
 
-  drawGreenscreen({ sourceCanvas: inCanvas, params });
-  // drawGlFxCanvas({ sourceCanvas: greenscreenCanvas, params });
+  drawWebcamEffectsShader({ sourceCanvas: inCanvas, params });
   drawArtCanvas({
-    sourceCanvas: greenscreenCanvas,
+    sourceCanvas: webcamEffectsCanvas,
     params,
     img,
     ...artworkSize,
