@@ -1,25 +1,20 @@
 import { getFlippedVideoCanvas } from "./utils/getFlippedVideoCanvas.js";
 import { reloadAfterMs } from "./utils/setupWebcam.js";
 import { drawArtCanvas } from "./drawArtCanvas.js";
-import {
-  drawWebcamEffectsShader,
-  setupWebcamEffectsShader,
-} from "./webgl-watercolourEffect/drawWebcamEffectCanvas.js";
+import { webGlWaterColourCanvas } from "./webgl-watercolourEffect/webGlWaterColourCanvas.js";
 import { webGLGreenScreenCanvas } from "./webgl-greenscreen/webGLGreenScreenCanvas.js";
 
 // app elements
-const inCanvas = document.getElementById("inCanvas");
-
 const videoColorSelector = document.querySelector("#videoHolder");
 const video = document.querySelector("#videoElement");
 
-const inWebGlCanvas = new webGLGreenScreenCanvas({
-  canvas: inCanvas,
+const canvasSize = {
   w: 1270,
   h: 1691,
-});
+};
 
-const webcamEffectsCanvas = setupWebcamEffectsShader({ w: 1270, h: 1691 });
+const webGlGreenScreenCanvas = new webGLGreenScreenCanvas({ ...canvasSize });
+const webcamEffectsCanvas = new webGlWaterColourCanvas({ ...canvasSize });
 
 // draw loop
 export function draw({ artworkSize, params, img }) {
@@ -43,11 +38,18 @@ export function draw({ artworkSize, params, img }) {
     flipY: false,
   });
 
-  inWebGlCanvas.update({ sourceCanvas: frameCanvas, params });
+  const gsCanvas = webGlGreenScreenCanvas.update({
+    sourceCanvas: frameCanvas,
+    params,
+  });
+  const fxCanvas = webcamEffectsCanvas.update({
+    sourceCanvas: gsCanvas,
+    params,
+  });
+  // drawWebcamEffectsShader({ sourceCanvas: inCanvas, params });
 
-  drawWebcamEffectsShader({ sourceCanvas: inCanvas, params });
   drawArtCanvas({
-    sourceCanvas: webcamEffectsCanvas,
+    sourceCanvas: fxCanvas,
     params,
     img,
     ...artworkSize,

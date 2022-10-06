@@ -1,28 +1,27 @@
-import { vert, frag } from "./greenScreen.shaders.js";
+import { vert, frag } from "./webcamEffects.shaders.js";
 
-const gsCanvas = document.createElement("canvas");
+const effectsCanvas = document.createElement("canvas");
 
-export class webGLGreenScreenCanvas {
+export class webGlWaterColourCanvas {
   constructor({ w, h }) {
     this.gl;
     this.prog;
-
+    this.texLoc;
     this.keyColorLoc;
     this.similarityLoc;
     this.smoothnessLoc;
     this.spillLoc;
 
-    this.texLoc;
-
     this.setup({ w, h });
   }
 
   setup({ w, h }) {
-    // Get A WebGL context
-    this.gl = gsCanvas.getContext("webgl", { premultipliedAlpha: false });
+    this.gl = effectsCanvas.getContext("webgl", {
+      premultipliedAlpha: false,
+    });
 
-    gsCanvas.width = w;
-    gsCanvas.height = h;
+    effectsCanvas.width = w;
+    effectsCanvas.height = h;
 
     // prog
     this.prog = this.gl.createProgram();
@@ -160,15 +159,13 @@ export class webGLGreenScreenCanvas {
 
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-
-    return this.canvas;
   }
 
   update({ sourceCanvas, params }) {
     if (!sourceCanvas) return;
 
-    gsCanvas.width = sourceCanvas.width;
-    gsCanvas.height = sourceCanvas.height;
+    effectsCanvas.width = sourceCanvas.width;
+    effectsCanvas.height = sourceCanvas.height;
     this.gl.viewport(0, 0, sourceCanvas.width, sourceCanvas.height);
     this.gl.texImage2D(
       this.gl.TEXTURE_2D,
@@ -196,7 +193,7 @@ export class webGLGreenScreenCanvas {
     // Draw the rectangle.
     this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
 
-    return gsCanvas;
+    return effectsCanvas;
   }
 
   setRectangle(gl, x, y, width, height) {

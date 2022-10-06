@@ -4,19 +4,6 @@ const artCtx = artCanvas.getContext("2d");
 const ghostCanvas = document.createElement("canvas");
 const ghostCtx = ghostCanvas.getContext("2d");
 
-/*
-
-Draw ghosting verstion
-- draw ghostCanvas to the art canvas
-- draw current frame to art canvas
-- wipe the ghostCanvas
-- set alpha to 0.2 or some such on ghost canvas
-- draw art canvas to ghost canvas
--
-- repeat.
-
-*/
-
 export function drawArtCanvas({ sourceCanvas, params, w, h, img }) {
   if (!sourceCanvas) return null;
 
