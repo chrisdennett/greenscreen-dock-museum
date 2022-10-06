@@ -1,4 +1,4 @@
-import { vert, frag } from "../../shaders/greenScreen.shaders.js";
+import { vert, frag } from "./greenScreen.shaders.js";
 
 export class webGLGreenScreenCanvas {
   constructor({ canvas, w, h }) {

@@ -1,11 +1,11 @@
 import { getFlippedVideoCanvas } from "./utils/getFlippedVideoCanvas.js";
 import { reloadAfterMs } from "./utils/setupWebcam.js";
-import { drawArtCanvas } from "./utils/drawArtCanvas.js";
+import { drawArtCanvas } from "./drawArtCanvas.js";
 import {
   drawWebcamEffectsShader,
   setupWebcamEffectsShader,
-} from "./utils/drawWebcamEffectCanvas.js";
-import { webGLGreenScreenCanvas } from "./utils/webGLGreenScreenCanvas.js";
+} from "./webgl-watercolourEffect/drawWebcamEffectCanvas.js";
+import { webGLGreenScreenCanvas } from "./webgl-greenscreen/webGLGreenScreenCanvas.js";
 
 // app elements
 const inCanvas = document.getElementById("inCanvas");

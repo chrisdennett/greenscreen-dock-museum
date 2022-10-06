@@ -1,4 +1,4 @@
-import { vert, frag } from "../../shaders/webcamEffects.shaders.js";
+import { vert, frag } from "./webcamEffects.shaders.js";
 
 const greenscreenCanvas = document.createElement("canvas");
 let gl;
