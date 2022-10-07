@@ -182,6 +182,7 @@ export class webGlWaterColourCanvas {
       this.gl.UNSIGNED_BYTE,
       sourceCanvas
     );
+
     this.gl.uniform1i(this.texLoc, 0);
 
     this.gl.uniform1f(this.brightnessLoc, params.brightness);
